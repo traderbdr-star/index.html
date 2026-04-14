@@ -23,82 +23,86 @@
             background-color: var(--bg-gray);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* باش يبدا من الفوق شوية */
             min-height: 100vh;
-            padding: 15px;
+            padding: 20px;
         }
 
         .container {
             background-color: #ffffff;
             width: 100%;
-            max-width: 400px;
+            max-width: 360px; /* قياس مناسب لأغلب الهواتف */
             border-radius: 30px;
-            padding: 30px 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 25px 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             text-align: center;
+            margin-top: 10px;
         }
 
-        /* Header & Date */
+        /* التاريخ */
         .date-container {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1rem;
             color: var(--black);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            line-height: 1.4;
         }
 
-        /* Timer Styles - التعديل هنا باش يجي ف الوسط */
+        /* العداد المعدل ليكون في الوسط وقياسه مناسب */
         #timer {
-            font-size: 4.5rem;
+            font-size: 3.8rem; /* صغرتو شوية باش ما يخرجش على الجنب */
             font-weight: 900;
             color: var(--black);
             display: block;
             width: 100%;
+            text-align: center; /* التمركز في الوسط */
             margin: 0 auto;
-            text-align: center; /* هادي هي اللي كتجيبو للوسط */
-            line-height: 1;
-            letter-spacing: -2px;
+            line-height: 1.1;
+            letter-spacing: -1px;
         }
 
         .next-prayer-label {
             display: inline-block;
             background-color: var(--light-emerald);
             color: var(--emerald);
-            padding: 8px 25px;
+            padding: 6px 20px;
             border-radius: 20px;
             font-weight: bold;
-            margin: 15px 0 35px;
-            font-size: 0.9rem;
+            margin: 15px 0 30px;
+            font-size: 0.85rem;
         }
 
-        /* Prayer List */
+        /* قائمة الصلوات */
         .prayer-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
+            padding: 0 5px;
         }
 
         .prayer-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
-            border-radius: 15px;
-            transition: all 0.3s;
+            padding: 12px 20px;
+            border-radius: 12px;
+            background-color: transparent;
+            border: 1px solid transparent;
         }
 
         .prayer-item.active {
-            border: 2px solid var(--emerald);
+            border: 1.5px solid var(--emerald);
             background-color: rgba(80, 141, 105, 0.05);
         }
 
         .prayer-name {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: var(--black);
         }
 
         .prayer-time {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-family: 'Courier New', Courier, monospace;
             font-weight: bold;
             color: var(--black);
@@ -115,7 +119,7 @@
     <div id="timer">00:00:00</div>
     
     <div class="next-prayer-label" id="next-label">
-        الوقت المتبقي لصلاة الفجر
+        جاري التحميل...
     </div>
 
     <div class="prayer-list">
@@ -143,7 +147,6 @@
 </div>
 
 <script>
-    // بيانات الصلاة لمدينة فاس (تقديرية بناء على الصورة)
     const prayerTimes = {
         "الفجر": "04:18",
         "الظهر": "12:25",
@@ -157,29 +160,30 @@
         
         // تحديث التاريخ
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
-        const hijriDate = "26 شَوَّال 1447 هـ"; // هادي خاصها API حقيقية ولكن خليتها كمتال
-        document.getElementById('full-date').innerText = `${hijriDate} | ${now.toLocaleDateString('en-GB', options)}`;
+        const hijriDate = "26 شَوَّال 1447 هـ"; 
+        document.getElementById('full-date').innerHTML = `${hijriDate}<br>${now.toLocaleDateString('en-GB', options)}`;
 
         let nextPrayer = "";
         let nextTime = null;
 
-        const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+        const hNow = now.getHours();
+        const mNow = now.getMinutes();
+        const currentTimeInMinutes = hNow * 60 + mNow;
 
-        // البحث عن الصلاة القادمة
         for (const [name, time] of Object.entries(prayerTimes)) {
-            if (time > currentTimeStr) {
+            const [h, m] = time.split(':').map(Number);
+            const prayerMinutes = h * 60 + m;
+            if (prayerMinutes > currentTimeInMinutes) {
                 nextPrayer = name;
-                const [h, m] = time.split(':');
                 nextTime = new Date();
                 nextTime.setHours(h, m, 0);
                 break;
             }
         }
 
-        // إذا فات العشاء، الصلاة القادمة هي الفجر
         if (!nextPrayer) {
             nextPrayer = "الفجر";
-            const [h, m] = prayerTimes["الفجر"].split(':');
+            const [h, m] = prayerTimes["الفجر"].split(':').map(Number);
             nextTime = new Date();
             nextTime.setDate(nextTime.getDate() + 1);
             nextTime.setHours(h, m, 0);
@@ -187,22 +191,20 @@
 
         document.getElementById('next-label').innerText = `الوقت المتبقي لصلاة ${nextPrayer}`;
 
-        // حساب العداد
         const diff = nextTime - now;
-        const hours = Math.floor(diff / 3600000);
-        const minutes = Math.floor((diff % 3600000) / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
+        const h = Math.floor(diff / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
 
         document.getElementById('timer').innerText = 
-            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-        // تمييز الصلاة الحالية
+        // تمييز الصلاة القادمة
         Object.keys(prayerTimes).forEach(p => {
-            const rowId = p === "الفجر" ? "fajr-row" : p === "الظهر" ? "dhuhr-row" : p === "العصر" ? "asr-row" : p === "المغرب" ? "maghrib-row" : "isha-row";
-            document.getElementById(rowId).classList.remove('active');
+            const id = p === "الفجر" ? "fajr-row" : p === "الظهر" ? "dhuhr-row" : p === "العصر" ? "asr-row" : p === "المغرب" ? "maghrib-row" : "isha-row";
+            document.getElementById(id).classList.remove('active');
+            if(p === nextPrayer) document.getElementById(id).classList.add('active');
         });
-        // مثال: تمييز الفجر بناء على الصورة
-        document.getElementById('fajr-row').classList.add('active');
     }
 
     setInterval(updateClock, 1000);
