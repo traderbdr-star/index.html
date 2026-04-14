@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>صلاتي فاس</title>
     <style>
         :root {
@@ -12,82 +12,86 @@
             --bg-gray: #f0f0f0;
         }
 
+        /* ضبط شامل باش ما يهرب والو للجنب */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg-gray);
+            font-family: 'Segoe UI', sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* باش يبدا من الفوق شوية */
+            align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            width: 100vw;
+            overflow: hidden; /* كيمنع التحرك الجانبي فالتطبيق */
         }
 
         .container {
             background-color: #ffffff;
-            width: 100%;
-            max-width: 360px; /* قياس مناسب لأغلب الهواتف */
+            width: 90%; /* عرض مرن كيتناسب مع التطبيق */
+            max-width: 350px;
             border-radius: 30px;
-            padding: 25px 15px;
+            padding: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             text-align: center;
-            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* فرض التمركز في الوسط لجميع العناصر */
         }
 
-        /* التاريخ */
         .date-container {
             font-weight: bold;
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: var(--black);
-            margin-bottom: 20px;
-            line-height: 1.4;
+            margin-bottom: 10px;
+            width: 100%;
         }
 
-        /* العداد المعدل ليكون في الوسط وقياسه مناسب */
+        /* العداد: رديتو Flex باش يجي ف الوسط بزز من WebToNative */
+        #timer-box {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin: 5px 0;
+        }
+
         #timer {
-            font-size: 3.8rem; /* صغرتو شوية باش ما يخرجش على الجنب */
+            font-size: 3.2rem;
             font-weight: 900;
             color: var(--black);
-            display: block;
-            width: 100%;
-            text-align: center; /* التمركز في الوسط */
-            margin: 0 auto;
             line-height: 1.1;
             letter-spacing: -1px;
         }
 
         .next-prayer-label {
-            display: inline-block;
             background-color: var(--light-emerald);
             color: var(--emerald);
-            padding: 6px 20px;
+            padding: 5px 15px;
             border-radius: 20px;
             font-weight: bold;
-            margin: 15px 0 30px;
-            font-size: 0.85rem;
+            margin: 10px 0 20px;
+            font-size: 0.8rem;
         }
 
-        /* قائمة الصلوات */
         .prayer-list {
+            width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding: 0 5px;
+            gap: 8px;
         }
 
         .prayer-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 20px;
+            padding: 10px 15px;
             border-radius: 12px;
-            background-color: transparent;
-            border: 1px solid transparent;
+            width: 100%;
         }
 
         .prayer-item.active {
@@ -95,121 +99,67 @@
             background-color: rgba(80, 141, 105, 0.05);
         }
 
-        .prayer-name {
-            font-size: 1.2rem;
+        .prayer-name, .prayer-time {
+            font-size: 1.1rem;
             font-weight: bold;
             color: var(--black);
         }
-
-        .prayer-time {
-            font-size: 1.2rem;
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: bold;
-            color: var(--black);
-        }
-
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="date-container" id="full-date">
-        </div>
+    <div class="date-container" id="full-date"></div>
 
-    <div id="timer">00:00:00</div>
-    
-    <div class="next-prayer-label" id="next-label">
-        جاري التحميل...
+    <div id="timer-box">
+        <div id="timer">00:00:00</div>
     </div>
+    
+    <div class="next-prayer-label" id="next-label">جاري الحساب...</div>
 
     <div class="prayer-list">
-        <div class="prayer-item" id="fajr-row">
-            <span class="prayer-time">04:18</span>
-            <span class="prayer-name">الفجر</span>
-        </div>
-        <div class="prayer-item" id="dhuhr-row">
-            <span class="prayer-time">12:25</span>
-            <span class="prayer-name">الظهر</span>
-        </div>
-        <div class="prayer-item" id="asr-row">
-            <span class="prayer-time">15:58</span>
-            <span class="prayer-name">العصر</span>
-        </div>
-        <div class="prayer-item" id="maghrib-row">
-            <span class="prayer-time">18:55</span>
-            <span class="prayer-name">المغرب</span>
-        </div>
-        <div class="prayer-item" id="isha-row">
-            <span class="prayer-time">20:13</span>
-            <span class="prayer-name">العشاء</span>
-        </div>
+        <div class="prayer-item" id="fajr-row"><span class="prayer-time">04:18</span><span class="prayer-name">الفجر</span></div>
+        <div class="prayer-item" id="dhuhr-row"><span class="prayer-time">12:25</span><span class="prayer-name">الظهر</span></div>
+        <div class="prayer-item" id="asr-row"><span class="prayer-time">15:58</span><span class="prayer-name">العصر</span></div>
+        <div class="prayer-item" id="maghrib-row"><span class="prayer-time">18:55</span><span class="prayer-name">المغرب</span></div>
+        <div class="prayer-item" id="isha-row"><span class="prayer-time">20:13</span><span class="prayer-name">العشاء</span></div>
     </div>
 </div>
 
 <script>
-    const prayerTimes = {
-        "الفجر": "04:18",
-        "الظهر": "12:25",
-        "العصر": "15:58",
-        "المغرب": "18:55",
-        "العشاء": "20:13"
-    };
+    const prayerTimes = {"الفجر":"04:18","الظهر":"12:25","العصر":"15:58","المغرب":"18:55","العشاء":"20:13"};
 
     function updateClock() {
         const now = new Date();
-        
-        // تحديث التاريخ
         const options = { day: 'numeric', month: 'short', year: 'numeric' };
-        const hijriDate = "26 شَوَّال 1447 هـ"; 
-        document.getElementById('full-date').innerHTML = `${hijriDate}<br>${now.toLocaleDateString('en-GB', options)}`;
+        document.getElementById('full-date').innerHTML = `26 شَوَّال 1447 هـ<br>${now.toLocaleDateString('en-GB', options)}`;
 
-        let nextPrayer = "";
-        let nextTime = null;
-
-        const hNow = now.getHours();
-        const mNow = now.getMinutes();
-        const currentTimeInMinutes = hNow * 60 + mNow;
+        let nextPrayer = "", nextTime = null;
+        const currentMin = now.getHours() * 60 + now.getMinutes();
 
         for (const [name, time] of Object.entries(prayerTimes)) {
             const [h, m] = time.split(':').map(Number);
-            const prayerMinutes = h * 60 + m;
-            if (prayerMinutes > currentTimeInMinutes) {
-                nextPrayer = name;
-                nextTime = new Date();
-                nextTime.setHours(h, m, 0);
-                break;
+            if ((h * 60 + m) > currentMin) {
+                nextPrayer = name; nextTime = new Date(); nextTime.setHours(h, m, 0); break;
             }
         }
-
         if (!nextPrayer) {
-            nextPrayer = "الفجر";
-            const [h, m] = prayerTimes["الفجر"].split(':').map(Number);
-            nextTime = new Date();
-            nextTime.setDate(nextTime.getDate() + 1);
-            nextTime.setHours(h, m, 0);
+            nextPrayer = "الفجر"; const [h, m] = prayerTimes["الفجر"].split(':').map(Number);
+            nextTime = new Date(); nextTime.setDate(nextTime.getDate() + 1); nextTime.setHours(h, m, 0);
         }
 
         document.getElementById('next-label').innerText = `الوقت المتبقي لصلاة ${nextPrayer}`;
-
         const diff = nextTime - now;
-        const h = Math.floor(diff / 3600000);
-        const m = Math.floor((diff % 3600000) / 60000);
-        const s = Math.floor((diff % 60000) / 1000);
+        const h = Math.floor(diff / 3600000), m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('timer').innerText = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 
-        document.getElementById('timer').innerText = 
-            `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-
-        // تمييز الصلاة القادمة
         Object.keys(prayerTimes).forEach(p => {
             const id = p === "الفجر" ? "fajr-row" : p === "الظهر" ? "dhuhr-row" : p === "العصر" ? "asr-row" : p === "المغرب" ? "maghrib-row" : "isha-row";
             document.getElementById(id).classList.remove('active');
             if(p === nextPrayer) document.getElementById(id).classList.add('active');
         });
     }
-
-    setInterval(updateClock, 1000);
-    updateClock();
+    setInterval(updateClock, 1000); updateClock();
 </script>
-
 </body>
 </html>
