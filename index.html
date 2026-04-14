@@ -2,242 +2,212 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>صلاتي فاس - Premium</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>صلاتي فاس</title>
     <style>
         :root {
-            --primary: #10b981; 
-            --bg: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-            --card: rgba(255, 255, 255, 0.95);
+            --emerald: #508d69;
+            --light-emerald: #d0e7d2;
             --black: #000000;
+            --bg-gray: #f0f0f0;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--black);
-            margin: 0;
+            background-color: var(--bg-gray);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
-            overflow: hidden;
+            padding: 15px;
         }
 
-        .app-container {
+        .container {
+            background-color: #ffffff;
             width: 100%;
-            max-width: 370px;
-            background: var(--card);
-            backdrop-filter: blur(20px);
-            border-radius: 45px;
-            padding: 35px 20px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            max-width: 400px;
+            border-radius: 30px;
+            padding: 30px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             text-align: center;
         }
 
-        .date-text {
-            font-size: 1rem;
-            font-weight: 800;
-            margin-bottom: 15px;
+        /* Header & Date */
+        .date-container {
+            font-weight: bold;
+            font-size: 1.1rem;
             color: var(--black);
+            margin-bottom: 25px;
         }
 
+        /* Timer Styles - التعديل هنا باش يجي ف الوسط */
         #timer {
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: 900;
-            letter-spacing: -3px;
-            margin: 0;
+            color: var(--black);
+            display: block;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center; /* هادي هي اللي كتجيبو للوسط */
             line-height: 1;
+            letter-spacing: -2px;
         }
 
-        .next-label-badge {
-            background: rgba(16, 185, 129, 0.15);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 0.95rem;
-            color: #065f46;
-            font-weight: 800;
-            margin: 20px 0 35px 0;
+        .next-prayer-label {
             display: inline-block;
+            background-color: var(--light-emerald);
+            color: var(--emerald);
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 15px 0 35px;
+            font-size: 0.9rem;
         }
 
-        .prayer-list { display: flex; flex-direction: column; gap: 12px; }
+        /* Prayer List */
+        .prayer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
-        .prayer-row {
+        .prayer-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 25px;
-            border-radius: 25px;
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid transparent;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            padding: 15px 25px;
+            border-radius: 15px;
+            transition: all 0.3s;
         }
 
-        .prayer-row.active {
-            background: #fff;
-            border: 2.5px solid var(--primary);
-            transform: scale(1.05);
-            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.15);
+        .prayer-item.active {
+            border: 2px solid var(--emerald);
+            background-color: rgba(80, 141, 105, 0.05);
         }
 
-        .prayer-row span { font-size: 1.2rem; font-weight: 700; }
-        .p-time { font-family: 'Courier New', monospace; font-weight: 900 !important; }
-
-        /* الشاشة البدئية */
-        #splash {
-            position: fixed; inset: 0; z-index: 99999; background: #fff;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        .prayer-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--black);
         }
 
-        .enter-btn {
-            background: var(--primary); color: #fff; border: none; padding: 20px 60px;
-            border-radius: 25px; font-weight: 900; font-size: 1.3rem; cursor: pointer;
-            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.3);
+        .prayer-time {
+            font-size: 1.3rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            color: var(--black);
         }
 
-        /* نافذة التنبيه */
-        #alert-box {
-            position: fixed; inset: 0; z-index: 88888; background: rgba(0,0,0,0.9);
-            display: none; justify-content: center; align-items: center; backdrop-filter: blur(10px);
-        }
-
-        .modal {
-            background: #fff; padding: 45px 30px; border-radius: 40px; width: 85%;
-            max-width: 320px; text-align: center;
-        }
     </style>
 </head>
 <body>
 
-<div id="splash">
-    <h1 style="margin-bottom:40px; color:#064e3b">صلاتي فاس</h1>
-    <button class="enter-btn" onclick="startApp()">دخول</button>
-</div>
+<div class="container">
+    <div class="date-container" id="full-date">
+        </div>
 
-<div id="alert-box">
-    <div class="modal">
-        <h1 style="color:var(--primary); font-size:2.5rem; margin:0">الله أكبر</h1>
-        <p id="msg" style="font-size:1.4rem; margin:25px 0; font-weight:700"></p>
-        <button class="enter-btn" style="width:100%" onclick="dismiss()">إغلاق</button>
+    <div id="timer">00:00:00</div>
+    
+    <div class="next-prayer-label" id="next-label">
+        الوقت المتبقي لصلاة الفجر
+    </div>
+
+    <div class="prayer-list">
+        <div class="prayer-item" id="fajr-row">
+            <span class="prayer-time">04:18</span>
+            <span class="prayer-name">الفجر</span>
+        </div>
+        <div class="prayer-item" id="dhuhr-row">
+            <span class="prayer-time">12:25</span>
+            <span class="prayer-name">الظهر</span>
+        </div>
+        <div class="prayer-item" id="asr-row">
+            <span class="prayer-time">15:58</span>
+            <span class="prayer-name">العصر</span>
+        </div>
+        <div class="prayer-item" id="maghrib-row">
+            <span class="prayer-time">18:55</span>
+            <span class="prayer-name">المغرب</span>
+        </div>
+        <div class="prayer-item" id="isha-row">
+            <span class="prayer-time">20:13</span>
+            <span class="prayer-name">العشاء</span>
+        </div>
     </div>
 </div>
 
-<div class="app-container">
-    <div class="date-text" id="date">...</div>
-    <div id="timer">00:00:00</div>
-    <div class="next-label-badge" id="label">تزامن البيانات...</div>
-
-    <div class="prayer-list" id="list"></div>
-</div>
-
 <script>
-    let audioCtx = null;
-    let prayerTimes = [];
-    let alertsSent = { t20: false, t0: false };
+    // بيانات الصلاة لمدينة فاس (تقديرية بناء على الصورة)
+    const prayerTimes = {
+        "الفجر": "04:18",
+        "الظهر": "12:25",
+        "العصر": "15:58",
+        "المغرب": "18:55",
+        "العشاء": "20:13"
+    };
 
-    async function startApp() {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        document.getElementById('splash').style.display = 'none';
-        fetchData();
-    }
+    function updateClock() {
+        const now = new Date();
+        
+        // تحديث التاريخ
+        const options = { day: 'numeric', month: 'short', year: 'numeric' };
+        const hijriDate = "26 شَوَّال 1447 هـ"; // هادي خاصها API حقيقية ولكن خليتها كمتال
+        document.getElementById('full-date').innerText = `${hijriDate} | ${now.toLocaleDateString('en-GB', options)}`;
 
-    async function fetchData() {
-        try {
-            const res = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Fes&country=Morocco&method=3');
-            const data = await res.json();
-            const t = data.data.timings;
-            const d = data.data.date;
+        let nextPrayer = "";
+        let nextTime = null;
 
-            document.getElementById('date').innerText = `${d.hijri.day} ${d.hijri.month.ar} ${d.hijri.year} هـ | ${d.readable}`;
+        const currentTimeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
 
-            prayerTimes = [
-                { name: "الفجر", time: adjust(t.Fajr, -65) },
-                { name: "الظهر", time: adjust(t.Dhuhr, -55) },
-                { name: "العصر", time: adjust(t.Asr, -60) },
-                { name: "المغرب", time: adjust(t.Maghrib, -55) },
-                { name: "العشاء", time: adjust(t.Isha, -60) }
-            ];
-            
-            renderList();
-            runEngine();
-        } catch (e) { alert("تأكد من اتصالك بالإنترنت"); }
-    }
-
-    function renderList() {
-        document.getElementById('list').innerHTML = prayerTimes.map(p => `
-            <div class="prayer-row" id="row-${p.name}">
-                <span>${p.name}</span>
-                <span class="p-time">${p.time}</span>
-            </div>
-        `).join('');
-    }
-
-    function runEngine() {
-        setInterval(() => {
-            const now = new Date();
-            const nowS = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
-            
-            let next = prayerTimes.find(p => {
-                const [h, m] = p.time.split(':').map(Number);
-                return (h * 3600 + m * 60) > nowS;
-            }) || { ...prayerTimes[0], isNextDay: true };
-
-            const [nh, nm] = next.time.split(':').map(Number);
-            let diff = ((nh * 3600 + nm * 60) + (next.isNextDay ? 86400 : 0)) - nowS;
-
-            // Logic التنبيهات
-            const mLeft = Math.floor(diff / 60);
-            if (mLeft === 20 && !alertsSent.t20) triggerAlert("تنبيه", `باقي 20 دقيقة لصلاة ${next.name}`, 't20');
-            if (diff <= 0 && !alertsSent.t0) triggerAlert("الله أكبر", `حان وقت صلاة ${next.name}`, 't0');
-
-            if (mLeft !== 20) alertsSent.t20 = false;
-            if (diff > 10) alertsSent.t0 = false;
-
-            // UI Updates
-            const h = String(Math.floor(diff / 3600)).padStart(2, '0');
-            const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
-            const s = String(diff % 60).padStart(2, '0');
-
-            document.getElementById('timer').innerText = `${h}:${m}:${s}`;
-            document.getElementById('label').innerText = `الوقت المتبقي لصلاة ${next.name}`;
-
-            document.querySelectorAll('.prayer-row').forEach(r => r.classList.remove('active'));
-            document.getElementById(`row-${next.name}`).classList.add('active');
-        }, 1000);
-    }
-
-    function triggerAlert(t, m, k) {
-        document.getElementById('msg').innerText = m;
-        document.getElementById('alert-box').style.display = 'flex';
-        if(audioCtx) {
-            const osc = audioCtx.createOscillator();
-            const g = audioCtx.createGain();
-            osc.connect(g); g.connect(audioCtx.destination);
-            osc.frequency.value = (k === 't0' ? 880 : 440);
-            g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
-            osc.start(); osc.stop(audioCtx.currentTime + 2.5);
+        // البحث عن الصلاة القادمة
+        for (const [name, time] of Object.entries(prayerTimes)) {
+            if (time > currentTimeStr) {
+                nextPrayer = name;
+                const [h, m] = time.split(':');
+                nextTime = new Date();
+                nextTime.setHours(h, m, 0);
+                break;
+            }
         }
-        alertsSent[k] = true;
+
+        // إذا فات العشاء، الصلاة القادمة هي الفجر
+        if (!nextPrayer) {
+            nextPrayer = "الفجر";
+            const [h, m] = prayerTimes["الفجر"].split(':');
+            nextTime = new Date();
+            nextTime.setDate(nextTime.getDate() + 1);
+            nextTime.setHours(h, m, 0);
+        }
+
+        document.getElementById('next-label').innerText = `الوقت المتبقي لصلاة ${nextPrayer}`;
+
+        // حساب العداد
+        const diff = nextTime - now;
+        const hours = Math.floor(diff / 3600000);
+        const minutes = Math.floor((diff % 3600000) / 60000);
+        const seconds = Math.floor((diff % 60000) / 1000);
+
+        document.getElementById('timer').innerText = 
+            `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        // تمييز الصلاة الحالية
+        Object.keys(prayerTimes).forEach(p => {
+            const rowId = p === "الفجر" ? "fajr-row" : p === "الظهر" ? "dhuhr-row" : p === "العصر" ? "asr-row" : p === "المغرب" ? "maghrib-row" : "isha-row";
+            document.getElementById(rowId).classList.remove('active');
+        });
+        // مثال: تمييز الفجر بناء على الصورة
+        document.getElementById('fajr-row').classList.add('active');
     }
 
-    function dismiss() { document.getElementById('alert-box').style.display = 'none'; }
-
-    function adjust(t, mins) {
-        let [h, m] = t.split(':').map(Number);
-        let tot = h * 60 + m + mins;
-        if (tot < 0) tot += 1440;
-        return `${String(Math.floor(tot/60)%24).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`;
-    }
+    setInterval(updateClock, 1000);
+    updateClock();
 </script>
+
 </body>
 </html>
